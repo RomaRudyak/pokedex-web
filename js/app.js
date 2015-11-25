@@ -1,15 +1,62 @@
-var loadData = (function ($, ko, rootElement) {
+var init = (function ($, ko, rootElement) {
 
 	// NOTE: we support only firs 718 pokemons form childhood
 	var MAX_POKEMON_COUNT = 718;
+	var API_HOST = 'http://pokeapi.co/';
 
 	function PokemonViewModel(pokemon) {
+		var thisVM = this;
 		var resourceUri = pokemon.resource_uri;
 		var id = resourceUri.match(/(\d+)\/$/)[1];
 
-		this.name = pokemon.name;
-		this.id = id
-		this.img = 'http://pokeapi.co/media/img/' + id + '.png';
+		Object.defineProperty(thisVM, 'name', {
+			get: function () {
+				return pokemon.name;
+			}
+		});
+		Object.defineProperty(thisVM, 'id', {
+			get: function () {
+				return id;
+			}
+		});
+
+		Object.defineProperty(thisVM, 'img', {
+			get: function () {
+				return API_HOST + 'media/img/' + id + '.png';
+			}
+		});
+
+		thisVM.loaded = ko.observable(false);
+
+		thisVM.attack = ko.observable('');
+		thisVM.defense = ko.observable('');
+		thisVM.height = ko.observable('');
+		thisVM.weight = ko.observable('');
+		thisVM.hp = ko.observable('');
+		thisVM.type = ko.observable('');
+
+		this.loadData = function () {
+			$.ajax({
+				url: API_HOST + resourceUri,
+				method: 'GET',
+				type: 'json'
+			})
+				.success(function (data) {
+					thisVM.attack(data.attack);
+					thisVM.defense(data.defense);
+					thisVM.height(data.height);
+					thisVM.weight(data.weight);
+					thisVM.hp(data.hp);
+					thisVM.type(
+						data.types
+							.map(function (t) {
+								return t.name;
+							})
+							.join('/'));
+					
+					thisVM.loaded(true);
+				});
+		}
 	}
 
 	function PokedexViewModel() {
@@ -28,14 +75,14 @@ var loadData = (function ($, ko, rootElement) {
 			})
 		});
 
-		this.init = function () {
+		this.featchData = function () {
 			thisVM.loading(true);
 			$.ajax({
-				url: 'http://pokeapi.co/api/v1/pokedex/1/',
+				url: API_HOST + 'api/v1/pokedex/1/',
 				method: 'GET',
 				type: 'json'
 			})
-				.done(function (data, textStatus, jqXHR) {
+				.success(function (data, textStatus, jqXHR) {
 
 					var viewModels = data.pokemon
 						.map(function (p) {
@@ -48,7 +95,7 @@ var loadData = (function ($, ko, rootElement) {
 					if (viewModels.length > MAX_POKEMON_COUNT) {
 						viewModels.length = MAX_POKEMON_COUNT;
 					}
-					
+
 					thisVM.pokemons(viewModels);
 					thisVM.loading(false);
 				});
@@ -60,7 +107,22 @@ var loadData = (function ($, ko, rootElement) {
 	var rootVM = new PokedexViewModel()
 	ko.applyBindings(rootVM, rootElement);
 
-	return rootVM.init;
-})(jQuery, ko, document.body);
+	// UI related logi here
+	return function () {
+		var $dialog = $('#pokemonInfo').modal({
+			show: false
+		});
+		rootVM.featchData();
+		$('.container').on('click', '.pokemon', function (event) {
+			var pokemon = ko.dataFor(event.target);
+			pokemon.loaded() || pokemon.loadData();
+			var node = $dialog[0];
+			ko.cleanNode(node);
+			ko.applyBindings(pokemon, node);
+			$dialog.modal('show');
+		});
+	};
 
-$(document).ready(loadData);
+})(jQuery, ko, document.getElementsByClassName('pokedex')[0]);
+
+$(document).ready(init);

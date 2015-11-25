@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Pokemon :: Pokedex</title>
 
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>Pokemon :: Pokedex</title>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-	<style>
+  <style>
     body {
       background-image: url('img/bg.jpg');
       background-color: steelblue;
@@ -25,66 +26,127 @@
       /*background-size: 100% 100%;*/
     }
     
-		.pokedex {
+    .pokedex {
       width: 90%;
       padding: 15px;
       text-align: center;
-		}
-    .logo{
+    }
+    
+    .logo {
       height: 150px;
     }
+    
     .pokemon {
       padding-bottom: 0px;
     }
-    .pokemon label{
-      background: #F44336;
+    
+    .pokemon label {
       width: 100%;
       margin-bottom: 0px;
-      color: white;
     }
-    .pokemon .panel{
-      overflow: hidden;   
+    
+    .pokemon .panel {
+      overflow: hidden;
     }
+    
     .search {
       vertical-align: middle;
     }
-	</style>
-  </head>
-  <body>
-    
-	<div class="container pokedex">
+  </style>
+</head>
+
+<body>
+
+  <div class="container pokedex">
     <div class="row">
       <div class="panel panel-info logo">
         <img src="img/pokemon-logo.gif" alt="img/pokemon-logo.gif" class="img-responsive center-block">
       </div>
     </div>
-		<div class="row panel search">
-        <label for="" class="col-xs-2 col-sm-2 col-md-2 col-lg-2">Search:</label>
-				<input type="text" class="col-xs-9 col-sm-9 col-md-9 col-lg-9" data-bind="textInput: search" />
-		</div>
+    <div class="row panel search">
+      <label for="" class="col-xs-2 col-sm-2 col-md-2 col-lg-2">Search:</label>
+      <input type="text" class="col-xs-9 col-sm-9 col-md-9 col-lg-9" data-bind="textInput: search" />
+    </div>
     <div class="row">
-      <div class="row" data-bind="visible: loading" >
+      <div class="row" data-bind="visible: loading">
         <img src="img/loading.gif" />
       </div>
       <div class="row" data-bind="visible: !loading(), template: { name: 'pokemon', foreach: filterdPokemons }"></div>
     </div>
-	</div>
-  
+  </div>
+
   <script type="text/html" id="pokemon">
     <div class="pokemon text-center col-xs-6 col-sm-3 col-md-3">
       <div class="panel">
         <img class="img-responsive img-rounded center-block" data-bind="attr: {src: img }" alt="Image" />
-        <label data-bind="{text: name }"></label>
+        <label class="text-capitalize label label-danger col-xs-12" data-bind="{text: name }"></label>
       </div>
     </div>
   </script>
 
-  <script src="js/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="js/bootstrap.min.js"></script>
-    
-  <script src="js/knockout-min.js"></script>
-    
-  <script src="js/app.js"></script>
-  </body>
+  <div class="modal fade" id="pokemonInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <button type="button" class="close visible-md visible-lg" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <div class="row">
+            <div class="pokemon text-center col-xs-12">
+              <div class="panel">
+                <img class="img-responsive img-rounded center-block" data-bind="attr: {src: img }" alt="Image" />
+                <label class="text-capitalize label label-danger col-xs-12" data-bind="{text: name }"></label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="row">
+                <h4>
+                  <span class="text text-danger col-xs-8">
+                    Type:
+                    <span class="text-capitalize" data-bind="{text: type}"></span>
+                  </span>
+                  <span class="text text-danger col-xs-4">
+                    Health:
+                    <span data-bind="{text: hp}"></span>
+                  </span>
+                </h4>
+              </div>
+              <div class="row">
+                <h4>
+                  <span class="text text-danger col-xs-6">
+                    Attack:
+                    <span data-bind="{text: attack}"></span>
+                  </span>
+                  <span class="text text-danger col-xs-6">
+                    Defense:
+                    <span data-bind="{text: defense}"></span>
+                  </span>
+                  <span class="text text-danger col-xs-6">
+                    Height:
+                    <span data-bind="{text: height}"></span>
+                  </span>
+                  <span class="text text-danger col-xs-6">
+                    Weight:
+                    <span data-bind="{text: weight}"></span>
+                  </span>
+                </h4>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer visible-xs visible-sm">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/knockout-min.js"></script>
+
+    <script src="js/app.js"></script>
+</body>
+
 </html>
